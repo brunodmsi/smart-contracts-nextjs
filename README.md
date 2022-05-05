@@ -5,4 +5,7 @@ TODO
 - [x] Implement smart contract
 - [x] Connect MetaMask wallet to Web3.js
 - [x] Execute contract funcs
-- [ ] Swap using [1inch](https://1inch.io/api/) 
+- [x] Swap using [1inch](https://1inch.io/api/) 
+- [ ] Use Web3-React provider to wrap the code
+- [ ] Custom amount on amount to swap
+- [ ] Better styling using Tailwind
