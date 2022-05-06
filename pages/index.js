@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react';
-import Web3 from 'web3';
+import { useWeb3React } from '@web3-react/core';
+import { InjectedConnector } from '@web3-react/injected-connector';
+
 import TokenDisplay from '../components/TokenDisplay';
 
 import abi from '../constants/abi';
@@ -7,62 +9,52 @@ import { swap } from '../services/oneinch';
 
 const CONTRACT_ADDRESS = '0x5FbDB2315678afecb367f032d93F642f64180aa3';
 
-const web3 = new Web3();
+const injected = new InjectedConnector({
+  supportedChainIds: [1, 3, 4, 5, 42, 31337]
+});
 
 export default function Home() {
-  const [isConnected, setIsConnected] = useState(false);
+  const { activate, active, library: provider, deactivate } = useWeb3React();
+
   const [signer, setSigner] = useState(null);
   const [swapData, setSwapData] = useState(null);
 
   useEffect(() => {
-    web3.setProvider(window.ethereum);
-  }, []);
+    if (provider) {
+      provider.eth.getAccounts().then((accounts) => {
+        setSigner(accounts[0]);
+      });
+    } 
+  }, [provider])
 
   async function connect() {
-    if (typeof window.ethereum !== 'undefined') {
-      try {
-        await ethereum.request({ 
-          method: 'eth_requestAccounts' 
-        });
-
-        const accounts = await web3.eth.getAccounts();
-        if (!accounts.length) {
-          throw new Error('No accounts connected');
-        }
-
-        const account = accounts[0];
-
-        setSigner(account);
-        setIsConnected(true);
-      } catch (error) {
-        console.log(error);
-        setIsConnected(false);
-      }
+    try {
+      await activate(injected);
+    } catch (error) {
+      console.log(error);
     }
   }
 
   async function requestSwap() {
-    if (typeof window.ethereum !== 'undefined') {
-      try {
-        const swapResponse = await swap({
-          amount: 1,
-          fromTokenAddress: '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE',
-          toTokenAddress: '0x111111111117dc0aa78b770fa6a738034120c302',
-          fromAddress: signer,
-        });
+    try {
+      const swapResponse = await swap({
+        amount: 1,
+        fromTokenAddress: '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE',
+        toTokenAddress: '0x111111111117dc0aa78b770fa6a738034120c302',
+        fromAddress: signer,
+      });
 
-        setSwapData(swapResponse.data);
-      } catch (error) {
-        console.log(error);
-      }
+      setSwapData(swapResponse.data);
+    } catch (error) {
+      console.log(error);
     }
   }
 
   async function executeSwap() {
-    if (typeof window.ethereum !== 'undefined' && swapData) {
-      const { from, data, gas, gasPrice, to, value } = swapData.tx;
+    const { from, data, gas, gasPrice, to, value } = swapData.tx;
 
-      const contract = new web3.eth.Contract(abi, CONTRACT_ADDRESS, {
+    try {
+      const contract = new provider.eth.Contract(abi, CONTRACT_ADDRESS, {
         from,
         data,
         gas,
@@ -72,14 +64,22 @@ export default function Home() {
       });
 
       await contract.methods.store(42).send();
+    } catch (e) {
+      console.log(e);
     }
+  }
+
+  async function disconnect() {
+    await deactivate();
   }
 
   return (
     <div>
-      {isConnected ? (
+      {active ? (
         <>
-          Connected <br />
+          Connected 
+          <button onClick={() => disconnect()}>Disconnect</button>
+          <br />
           <button onClick={() => requestSwap()}>Request Swap</button>
         </>
       ) : (
