@@ -8,4 +8,4 @@ TODO
 - [x] Swap using [1inch](https://1inch.io/api/) 
 - [x] Use Web3-React provider to wrap the code
 - [x] Custom amount on amount to swap
-- [ ] Better styling using Tailwind
+- [x] Better styling using Tailwind
