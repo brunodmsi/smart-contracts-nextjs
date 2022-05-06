@@ -16,6 +16,7 @@ const injected = new InjectedConnector({
 export default function Home() {
   const { activate, active, library: provider, deactivate } = useWeb3React();
 
+  const [amount, setAmount] = useState(null);
   const [signer, setSigner] = useState(null);
   const [swapData, setSwapData] = useState(null);
 
@@ -37,8 +38,13 @@ export default function Home() {
 
   async function requestSwap() {
     try {
+      const convertedAmount = Number(amount);
+      if (!amount || isNaN(convertedAmount)) {
+        return;
+      }
+
       const swapResponse = await swap({
-        amount: 1,
+        amount: convertedAmount,
         fromTokenAddress: '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE',
         toTokenAddress: '0x111111111117dc0aa78b770fa6a738034120c302',
         fromAddress: signer,
@@ -80,6 +86,7 @@ export default function Home() {
           Connected 
           <button onClick={() => disconnect()}>Disconnect</button>
           <br />
+          <input onClick={(e) => setAmount(e.target.value)} type="text" />
           <button onClick={() => requestSwap()}>Request Swap</button>
         </>
       ) : (
