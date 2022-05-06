@@ -85,7 +85,79 @@ export default function Home() {
   }
 
   return (
-    <div>
+    <div className="flex flex-col justify-center items-center">
+
+      <div className="flex flex-col justify-center items-center">
+        {active ? (
+          <>
+            <button 
+              className="border-2 px-2 border-blue-400 hover:bg-blue-400" 
+              onClick={() => disconnect()}>
+                Disconnect
+            </button>
+          	<p>Connected</p>
+            
+            <div className="my-2" />
+            
+            <div className="flex flex-col">
+              <label htmlFor="amount">Amount to swap</label>
+              <input 
+                id="amount" 
+                className="border-2 px-2 border-grey-400"
+                onClick={(e) => setAmount(e.target.value)} 
+                type="text" 
+              />
+              <button 
+								className="border-2 px-2 border-blue-400 hover:bg-blue-400" 
+                onClick={() => requestSwap()}
+              >
+                Request Swap
+              </button>
+            </div>
+          </>
+        ) : (
+            <>
+              <p className="text-red-400">Not Connected</p>
+              <button 
+                className="border-2 px-2 border-blue-400 hover:bg-blue-400" 
+                onClick={() => connect()}>
+                  Connect
+              </button>
+            </>
+        )}
+      </div>
+
+      <div className="my-2" />
+
+      {swapData && (
+        <>
+          <div className="flex flex-row gap-5">
+            <TokenDisplay 
+              name={swapData.fromToken.name} 
+              symbol={swapData.fromToken.symbol} 
+              logo={swapData.fromToken.logoURI} 
+              amount={swapData.fromTokenAmount}
+            />
+
+            to
+
+            <TokenDisplay 
+              name={swapData.toToken.name} 
+              symbol={swapData.toToken.symbol} 
+              logo={swapData.toToken.logoURI} 
+              amount={swapData.toTokenAmount}
+            />
+          </div>
+
+          <button 
+            className="border-2 px-2 border-blue-400 hover:bg-blue-400" 
+            onClick={() => executeSwap()}
+          >
+            Execute Swap
+          </button>
+        </>
+      )}
+      
       {error && 
         <p 
           style={{
@@ -95,48 +167,6 @@ export default function Home() {
           {error}
         </p>
       }
-
-      {active ? (
-        <>
-          Connected 
-          <button onClick={() => disconnect()}>Disconnect</button>
-          <br />
-          <input onClick={(e) => setAmount(e.target.value)} type="text" />
-          <button onClick={() => requestSwap()}>Request Swap</button>
-        </>
-      ) : (
-        <>
-          Not connected <br />
-          <button onClick={() => connect()}>Connect</button>
-        </>
-      )}
-
-      <br />
-
-      {swapData && (
-        <>
-          <TokenDisplay 
-            name={swapData.fromToken.name} 
-            symbol={swapData.fromToken.symbol} 
-            logo={swapData.fromToken.logoURI} 
-            amount={swapData.fromTokenAmount}
-          />
-          <br />
-
-          to
-
-          <br />
-          <TokenDisplay 
-            name={swapData.toToken.name} 
-            symbol={swapData.toToken.symbol} 
-            logo={swapData.toToken.logoURI} 
-            amount={swapData.toTokenAmount}
-          />
-        
-          <br />
-          <button onClick={() => executeSwap()}>Execute Swap</button>
-        </>
-      )}
     </div>
   )
 }
