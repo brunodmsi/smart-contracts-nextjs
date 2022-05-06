@@ -16,6 +16,7 @@ const injected = new InjectedConnector({
 export default function Home() {
   const { activate, active, library: provider, deactivate } = useWeb3React();
 
+  const [error, setError] = useState(null);
   const [amount, setAmount] = useState(null);
   const [signer, setSigner] = useState(null);
   const [swapData, setSwapData] = useState(null);
@@ -32,6 +33,7 @@ export default function Home() {
     try {
       await activate(injected);
     } catch (error) {
+      setError('Error connecting to account')
       console.log(error);
     }
   }
@@ -40,6 +42,7 @@ export default function Home() {
     try {
       const convertedAmount = Number(amount);
       if (!amount || isNaN(convertedAmount)) {
+        setError('Amount is not a valid value')
         return;
       }
 
@@ -52,6 +55,7 @@ export default function Home() {
 
       setSwapData(swapResponse.data);
     } catch (error) {
+      setError('Error requesting for swap')
       console.log(error);
     }
   }
@@ -71,6 +75,7 @@ export default function Home() {
 
       await contract.methods.store(42).send();
     } catch (e) {
+      setError('Error executing the swap')
       console.log(e);
     }
   }
@@ -81,6 +86,16 @@ export default function Home() {
 
   return (
     <div>
+      {error && 
+        <p 
+          style={{
+            color: 'red'
+          }}
+        >
+          {error}
+        </p>
+      }
+
       {active ? (
         <>
           Connected 

@@ -7,5 +7,5 @@ TODO
 - [x] Execute contract funcs
 - [x] Swap using [1inch](https://1inch.io/api/) 
 - [x] Use Web3-React provider to wrap the code
-- [ ] Custom amount on amount to swap
+- [x] Custom amount on amount to swap
 - [ ] Better styling using Tailwind
